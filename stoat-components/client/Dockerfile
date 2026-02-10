@@ -1,11 +1,17 @@
 # Stoat Client (Web Frontend) Dockerfile
-# Updated: 2026-02-10 : 1
-FROM node:20-alpine as builder
+# Updated: 2026-02-10 : 2
+FROM node:20-slim as builder
 
 WORKDIR /app
 
-# Install git and mise
-RUN apk add --no-cache git curl bash python3 make g++
+# Install required dependencies for building
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install mise
 RUN curl https://mise.run | sh
@@ -19,6 +25,9 @@ RUN mise trust
 
 # Install all packages using mise
 RUN mise install
+
+# Install Node.js dependencies
+RUN mise exec -- pnpm install
 
 # Build dependencies
 RUN mise build:deps

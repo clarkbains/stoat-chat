@@ -1,5 +1,5 @@
 # Stoat Server (API) Dockerfile
-# Updated: 2026-02-10 : 1
+# Updated: 2026-02-10 : 2
 FROM rust:1.92.0-slim as builder
 
 # Install required system dependencies
