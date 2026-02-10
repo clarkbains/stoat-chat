@@ -5,7 +5,7 @@ FROM node:20-alpine as builder
 WORKDIR /app
 
 # Install git and mise
-RUN apk add --no-cache git curl bash
+RUN apk add --no-cache git curl bash python3 make g++
 
 # Install mise
 RUN curl https://mise.run | sh
@@ -13,6 +13,9 @@ ENV PATH="/root/.local/bin:$PATH"
 
 # Clone the frontend repository
 RUN git clone --recursive https://github.com/stoatchat/for-web.git .
+
+# Trust mise configuration files
+RUN mise trust
 
 # Install all packages using mise
 RUN mise install
