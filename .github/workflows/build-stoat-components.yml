@@ -18,7 +18,7 @@ env:
 
 jobs:
   matrix-setup:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -32,7 +32,7 @@ jobs:
 
   build-and-push:
     needs: matrix-setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     strategy:
       matrix: ${{ fromJson(needs.matrix-setup.outputs.matrix) }}
     permissions:
@@ -91,4 +91,4 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/stoat/${{ matrix.component }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64

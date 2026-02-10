@@ -1,4 +1,5 @@
 # Stoat Autumn (File Server) Dockerfile
+# Updated: 2026-02-10
 FROM rust:1.75-slim as builder
 
 # Install required system dependencies
