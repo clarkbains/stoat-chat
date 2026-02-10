@@ -1,6 +1,6 @@
 # Stoat Autumn (File Server) Dockerfile
 # Updated: 2026-02-10
-FROM rust:1.75-slim as builder
+FROM rust:1.92.0-slim as builder
 
 # Install required system dependencies
 RUN apt-get update && apt-get install -y \
@@ -14,11 +14,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Clone the autumn repository
-RUN git clone https://github.com/revoltchat/autumn.git .
+# Clone the stoat backend repository
+RUN git clone https://github.com/stoatchat/stoatchat.git .
 
 # Build autumn
-RUN cargo build --release
+RUN cargo build --release --bin revolt-autumn
 
 # Runtime image
 FROM debian:bookworm-slim
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary
-COPY --from=builder /app/target/release/autumn /usr/local/bin/autumn
+COPY --from=builder /app/target/release/revolt-autumn /usr/local/bin/revolt-autumn
 
 # Create app user
 RUN useradd -r -s /bin/false revolt
@@ -39,6 +39,6 @@ RUN useradd -r -s /bin/false revolt
 # Switch to app user
 USER revolt
 
-EXPOSE 3000
+EXPOSE 14704
 
-CMD ["autumn"]
+CMD ["revolt-autumn"]

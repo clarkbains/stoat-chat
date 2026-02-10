@@ -1,6 +1,6 @@
 # Stoat Bonfire (Events Server) Dockerfile
 # Updated: 2026-02-10
-FROM rust:1.75-slim as builder
+FROM rust:1.92.0-slim as builder
 
 # Install required system dependencies
 RUN apt-get update && apt-get install -y \
@@ -13,11 +13,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Clone the bonfire repository
-RUN git clone https://github.com/revoltchat/bonfire.git .
+# Clone the stoat backend repository
+RUN git clone https://github.com/stoatchat/stoatchat.git .
 
 # Build bonfire
-RUN cargo build --release
+RUN cargo build --release --bin revolt-bonfire
 
 # Runtime image
 FROM debian:bookworm-slim
@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary
-COPY --from=builder /app/target/release/bonfire /usr/local/bin/bonfire
+COPY --from=builder /app/target/release/revolt-bonfire /usr/local/bin/revolt-bonfire
 
 # Create app user
 RUN useradd -r -s /bin/false revolt
@@ -37,6 +37,6 @@ RUN useradd -r -s /bin/false revolt
 # Switch to app user
 USER revolt
 
-EXPOSE 9000
+EXPOSE 14703
 
-CMD ["bonfire"]
+CMD ["revolt-bonfire"]

@@ -4,23 +4,30 @@ FROM node:20-alpine as builder
 
 WORKDIR /app
 
-# Install git
-RUN apk add --no-cache git
+# Install git and mise
+RUN apk add --no-cache git curl bash
+
+# Install mise
+RUN curl https://mise.run | sh
+ENV PATH="/root/.local/bin:$PATH"
 
 # Clone the frontend repository
-RUN git clone https://github.com/revoltchat/frontend.git .
+RUN git clone --recursive https://github.com/stoatchat/for-web.git .
 
-# Install dependencies
-RUN npm ci
+# Install all packages using mise
+RUN mise install
 
-# Build the application
-RUN npm run build
+# Build dependencies
+RUN mise build:deps
+
+# Build for web production
+RUN mise build:prod
 
 # Runtime image
 FROM nginx:alpine
 
 # Copy built files
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/packages/client/dist /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf

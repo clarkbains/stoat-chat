@@ -1,6 +1,6 @@
 # Stoat Crond (Background Tasks) Dockerfile
 # Updated: 2026-02-10
-FROM rust:1.75-slim as builder
+FROM rust:1.92.0-slim as builder
 
 # Install required system dependencies
 RUN apt-get update && apt-get install -y \
@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Clone the backend repository (crond is part of backend)
-RUN git clone https://github.com/revoltchat/backend.git .
+# Clone the stoat backend repository
+RUN git clone https://github.com/stoatchat/stoatchat.git .
 
 # Build crond
 RUN cargo build --release --bin revolt-crond

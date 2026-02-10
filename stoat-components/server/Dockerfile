@@ -1,6 +1,6 @@
 # Stoat Server (API) Dockerfile
 # Updated: 2026-02-10
-FROM rust:1.75-slim as builder
+FROM rust:1.92.0-slim as builder
 
 # Install required system dependencies
 RUN apt-get update && apt-get install -y \
@@ -8,16 +8,15 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     cmake \
     build-essential \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Clone the backend repository
-RUN apt-get update && apt-get install -y git && \
-    git clone https://github.com/revoltchat/backend.git . && \
-    rm -rf /var/lib/apt/lists/*
+# Clone the stoat backend repository
+RUN git clone https://github.com/stoatchat/stoatchat.git .
 
-# Build the server
+# Build the server (delta)
 RUN cargo build --release --bin revolt-delta
 
 # Runtime image
@@ -38,6 +37,6 @@ RUN useradd -r -s /bin/false revolt
 # Switch to app user
 USER revolt
 
-EXPOSE 8000
+EXPOSE 14702
 
 CMD ["revolt-delta"]
