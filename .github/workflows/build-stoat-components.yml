@@ -1,0 +1,94 @@
+name: Build and Push Stoat Components
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'stoat-components/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'stoat-components/**'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ca-central-1
+
+jobs:
+  matrix-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up matrix
+        id: set-matrix
+        run: |
+          echo 'matrix={"component":["server","bonfire","client","autumn","january","gifbox","crond","pushd"]}' >> $GITHUB_OUTPUT
+
+  build-and-push:
+    needs: matrix-setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.matrix-setup.outputs.matrix) }}
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Workflow dispatch - building all components"
+          elif [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            if git diff --name-only HEAD~1 HEAD | grep -q "^stoat-components/${{ matrix.component }}/"; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "Changes detected in ${{ matrix.component }}"
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "No changes in ${{ matrix.component }}"
+            fi
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "PR or other event - building component"
+          fi
+
+      - name: Configure AWS credentials
+        if: steps.changes.outputs.changed == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: steps.changes.outputs.changed == 'true'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        if: steps.changes.outputs.changed == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        if: steps.changes.outputs.changed == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./stoat-components/${{ matrix.component }}
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/stoat/${{ matrix.component }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/stoat/${{ matrix.component }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64

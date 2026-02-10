@@ -1,0 +1,10 @@
+# AWS Configuration
+aws_region = "us-east-1"
+
+# GitHub Repository Configuration
+github_org  = "your-github-org"
+github_repo = "stoat-infrastructure"
+
+# Optional: Custom names for resources
+# state_bucket_name = "my-custom-stoat-state-bucket"
+# lock_table_name   = "my-custom-terraform-locks"

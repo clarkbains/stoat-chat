@@ -1,0 +1,23 @@
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Domain Configuration
+# IMPORTANT: This domain must already exist as a Route53 hosted zone
+domain_name = "stoat.example.com"
+
+# Instance Configuration
+instance_type      = "t4g.small"  # ARM Graviton instance
+root_volume_size   = 30           # GB
+
+# S3 Configuration
+# Leave empty for auto-generated name
+s3_media_bucket_name = ""
+
+# Security Configuration
+# Set to your IP CIDR to enable SSH access, leave empty to disable
+# Example: "1.2.3.4/32" or "10.0.0.0/8"
+allowed_ssh_cidr = ""
+
+# Stoat Version
+# Specific version tag or "latest"
+stoat_version = "latest"
