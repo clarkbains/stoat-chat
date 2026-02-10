@@ -1,5 +1,5 @@
 # Stoat Client (Web Frontend) Dockerfile
-# Updated: 2026-02-10 : 2
+# Updated: 2026-02-10 : 3
 FROM node:20-slim as builder
 
 WORKDIR /app
