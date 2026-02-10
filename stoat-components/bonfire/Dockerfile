@@ -1,5 +1,5 @@
 # Stoat Bonfire (Events Server) Dockerfile
-# Updated: 2026-02-10
+# Updated: 2026-02-10 : 1
 FROM rust:1.92.0-slim as builder
 
 # Install required system dependencies

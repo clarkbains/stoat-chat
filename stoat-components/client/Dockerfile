@@ -1,5 +1,5 @@
 # Stoat Client (Web Frontend) Dockerfile
-# Updated: 2026-02-10
+# Updated: 2026-02-10 : 1
 FROM node:20-alpine as builder
 
 WORKDIR /app
