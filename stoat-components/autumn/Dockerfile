@@ -21,13 +21,13 @@ RUN git clone https://github.com/stoatchat/stoatchat.git .
 RUN cargo build --release --bin revolt-autumn
 
 # Runtime image
-FROM debian:bookworm-slim
+FROM ubuntu:24.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libssl3 \
-    libmagic1 \
+    libssl3t64 \
+    libmagic1t64 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary
